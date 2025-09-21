@@ -1,6 +1,5 @@
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
 
 import Token.Token;
 import Token.TokenCategory;
@@ -25,18 +24,18 @@ public class Scanner {
     File file;
 
     public static final Map<String, TokenCategory> OPERATORS = Map.of(
-        "load",  TokenCategory.MEMOP,
-        "loadI", TokenCategory.LOADI,
-        "store", TokenCategory.MEMOP,
+        "load",  TokenCategory.MEMOP, 
+        "loadI", TokenCategory.LOADI, 
+        "store", TokenCategory.MEMOP, 
         "add",   TokenCategory.ARITHOP,
-        "sub",   TokenCategory.ARITHOP,
-        "mult",  TokenCategory.ARITHOP,
+        "sub",   TokenCategory.ARITHOP, 
+        "mult",  TokenCategory.ARITHOP, 
         "lshift", TokenCategory.ARITHOP,
         "rshift", TokenCategory.ARITHOP,
         "nop",   TokenCategory.NOP,
         "output", TokenCategory.OUTPUT
     );
-    //public static final Set<String> OPERATORS = Set.of("load", "loadI", "store", "add", "sub", "mult", "lshift", "rshift", "output", "nop");
+
     public Scanner(File file) {
         try {
             this.file = file;
@@ -58,10 +57,6 @@ public class Scanner {
         while ((nextToken = nextToken()) != null){
             
             System.out.println(nextToken.toString());
-            // if (nextToken.getTokenCategory().ordinal() == 11) {
-            //     Token errToken = new Token(nextToken.getLineNumber(), TokenCategory.EOL, "\\n");
-            //     System.out.println(errToken.toString());
-            // }
             if (nextToken.getTokenCategory().ordinal() == 9) break;
         }
     }
@@ -142,9 +137,10 @@ public class Scanner {
         //System.out.println("current lexeme is: " + tokenLexeme);
         
         TokenCategory category = null;
+
         if (OPERATORS.containsKey(tokenLexeme)){
             category = OPERATORS.get(tokenLexeme);
-            
+
         } else if (isValidInteger(tokenLexeme)) {
             category = TokenCategory.CONSTANT;
             
@@ -213,8 +209,8 @@ public class Scanner {
         return str.equals("//");
     }
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(new File("test_inputs/t1.i"));
-        scanner.scanEntireFile();
-    }
+    // public static void main(String[] args) {
+    //     Scanner scanner = new Scanner(new File("test_inputs/t2.i"));
+    //     scanner.scanEntireFile();
+    // }
 }

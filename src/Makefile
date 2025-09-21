@@ -3,9 +3,12 @@ JAVAC = javac
 JAVA = java
 JAR = jar
 
-# Project files
-SOURCES = $(wildcard *.java)
-CLASSES = $(SOURCES:.java=.class)
+SRC_DIR = src
+BIN_DIR = bin
+# Find all Java sources recursively
+SOURCES := $(shell find $(SRC_DIR) -name "*.java")
+
+# Main class
 MAIN = Main
 
 # Targets
@@ -13,11 +16,13 @@ all: build
 
 build: lab1.jar 412fe
 
-lab1.jar: $(CLASSES)
-	$(JAR) cfe lab1.jar $(MAIN) $(CLASSES)
+# Compile all .java files at once into proper package folders
+classes:
+	mkdir -p $(BIN_DIR)
+	$(JAVAC) -d $(BIN_DIR) $(SOURCES)
 
-%.class: %.java
-	$(JAVAC) $<
+lab1.jar: classes
+	$(JAR) cfe lab1.jar $(MAIN) -C $(BIN_DIR)
 
 412fe:
 	echo '#!/bin/bash' > 412fe
@@ -25,4 +30,4 @@ lab1.jar: $(CLASSES)
 	chmod a+x 412fe
 
 clean:
-	rm -f *.class lab1.jar 412fe
+	rm -rf $(BIN_DIR) lab1.jar 412fe

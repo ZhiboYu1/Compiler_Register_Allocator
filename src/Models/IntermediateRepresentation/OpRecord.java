@@ -1,4 +1,4 @@
-package InternalRepresentation;
+package IntermediateRepresentation;
 
 public class OpRecord {
     private int line;
@@ -42,5 +42,9 @@ public class OpRecord {
     }
     public OpRecord getPrev() {
         return this.prev;
+    }
+    public String toString() {
+        return String.format("%d    [ %s ], [ %s ], [ %s ]", this.opCode, this.operand1 == null ? "" : this.operand1.toString(), 
+        this.operand2 == null ? "" : this.operand2.toString(), this.operand3 == null ? "" :this.operand3.toString());
     }
 }
