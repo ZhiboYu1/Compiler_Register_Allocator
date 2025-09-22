@@ -13,6 +13,6 @@
   sub   r3, r4 => r5
   mult  r5, r6 => r10
   lshift  r0, r3 => r2
-  rshiftf  r2, r3 => r2
+  rshift  r2, r3 => r2
   output 1024
   nop

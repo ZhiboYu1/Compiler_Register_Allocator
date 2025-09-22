@@ -31,3 +31,11 @@ lab1.jar: classes
 
 clean:
 	rm -rf $(BIN_DIR) lab1.jar 412fe
+
+#create zy53.tar file under lab1-dist directory
+dist:
+	mkdir -p lab1-dist
+	cp Makefile 412fe README lab1-dist/
+	cp -r src lab1-dist/
+	cd lab1-dist && tar cvf ../zy53.tar .
+	mv zy53.tar ../l1auto/TarFileGoesHere/
