@@ -29,7 +29,12 @@ public class Main {
         }
 
     }
-    
+    /**
+     * helper function to parse the file (and print IR) or scan only 
+     * @param filePath
+     * @param onlyScan
+     * @param printIR
+     */
     private static void scanParseFile(String filePath, boolean onlyScan, boolean printIR){
         File toBeParsedFile = new File(filePath);
         if (toBeParsedFile.exists()){
@@ -46,7 +51,7 @@ public class Main {
             }
             
         } else {
-            System.err.println("File does not exist!");
+            System.err.println("ERROR: File does not exist!");
             printCommandDescription();
         }
     }

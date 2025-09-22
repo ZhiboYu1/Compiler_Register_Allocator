@@ -70,6 +70,7 @@ public class Scanner {
      */
     public Token nextToken(){
         try{
+            // return a EOL token if the last token that we scanned has error
             if (prevIsErrToken) {
                 // reset prevIsErrToken to false
                 this.prevIsErrToken = false;
@@ -117,20 +118,30 @@ public class Scanner {
     private Token scanNextToken(){
         char[] currentLineCharArr = this.currentLine.toCharArray();
         // move the start index (currentLineIndex) to the first non-whitespace character
-        while (this.currentLineIndex < this.currentLineLength && currentLineCharArr[this.currentLineIndex] == ' '){
+        while (this.currentLineIndex < this.currentLineLength && Character.isWhitespace(currentLineCharArr[this.currentLineIndex])){
             this.currentLineIndex ++;
         }
         //System.out.println("current line index: " + this.currentLineIndex);
+        
         if (this.currentLineIndex == this.currentLineLength){
             this.hasPrintedEOL = true;
             return new Token(this.lineNumber, TokenCategory.EOL, "\\n");
          };
         
         int endOfNextTokenIndex = this.currentLineIndex + 1;
+        // check whether the following two characters is a comment
+        if ((currentLineCharArr[currentLineIndex] == currentLineCharArr[endOfNextTokenIndex]) && 
+        (currentLineCharArr[currentLineIndex] == '/')){
+            this.currentLineIndex = this.currentLineLength + 1;
+            return new Token(this.lineNumber, TokenCategory.EOL, "\\n");
+        }
+        
         // move the end index (endOfNextTokenIndex) to the last index before a whitespace/register/into sign
-        while (endOfNextTokenIndex < this.currentLineLength && (currentLineCharArr[endOfNextTokenIndex] != ' ') 
-            && (currentLineCharArr[endOfNextTokenIndex] != '=') && (currentLineCharArr[endOfNextTokenIndex] != ',')
-            && (currentLineCharArr[endOfNextTokenIndex] != 'r' || currentLineCharArr[endOfNextTokenIndex + 1] == 'e')){
+        while (endOfNextTokenIndex < this.currentLineLength
+            && !Character.isWhitespace(currentLineCharArr[endOfNextTokenIndex])
+            && currentLineCharArr[endOfNextTokenIndex] != '='
+            && currentLineCharArr[endOfNextTokenIndex] != ','
+            && (currentLineCharArr[endOfNextTokenIndex] != 'r' || currentLineCharArr[endOfNextTokenIndex + 1] == 'e')) {
             endOfNextTokenIndex++;
         }
         String tokenLexeme = new String(currentLineCharArr, this.currentLineIndex, endOfNextTokenIndex - this.currentLineIndex);
@@ -153,9 +164,6 @@ public class Scanner {
         } else if (isInto(tokenLexeme)){
             category = TokenCategory.INTO;
 
-        } else if (isComment(tokenLexeme)){
-            this.currentLineIndex = this.currentLineLength + 1;
-            return new Token(this.lineNumber, TokenCategory.EOL, "\\n");
         } else {
             //printErr(tokenLexeme);
             this.currentLineIndex = this.currentLineLength + 1;
@@ -209,8 +217,8 @@ public class Scanner {
         return str.equals("//");
     }
 
-    // public static void main(String[] args) {
-    //     Scanner scanner = new Scanner(new File("test_inputs/t2.i"));
-    //     scanner.scanEntireFile();
-    // }
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(new File("test_inputs/autoGraderTests/T8k2.i"));
+        scanner.scanEntireFile();
+    }
 }

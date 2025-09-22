@@ -109,108 +109,117 @@ public class Parser {
             case NOP:
                 return createNopIR(operationTokenLst);
             default:
+                printErr(operationTokenLst.get(0), operationTokenLst.get(0));
                 return null;
         }
     }
     private OpRecord createMemopIR(List<Token> operationTokenLst){
-        if (operationTokenLst.size() != 4) return null;
-        if (operationTokenLst.get(1).getTokenCategory() != TokenCategory.REGISTER){
-            printErr(operationTokenLst.get(1));
-            return null;    
-        } else if (operationTokenLst.get(2).getTokenCategory() != TokenCategory.INTO) {
-            printErr(operationTokenLst.get(2));
-            return null;
-        } else if (operationTokenLst.get(3).getTokenCategory() != TokenCategory.REGISTER) {
-            printErr(operationTokenLst.get(3));
-            return null;
-        }
+        Token shouldBeRegister1 = expectToken(operationTokenLst, 1, TokenCategory.REGISTER);
+        if (shouldBeRegister1 == null) return null;
+
+        Token shouldBeInto = expectToken(operationTokenLst, 2, TokenCategory.INTO);
+        if (shouldBeInto == null) return null;
+
+        Token shouldBeRegister2 = expectToken(operationTokenLst, 3, TokenCategory.REGISTER);
+        if (shouldBeRegister2 == null) return null;
+
         Token operatorToken = operationTokenLst.get(0);
         int lineNum = operatorToken.getLineNumber();
         int opCode = operatorToken.getOpCode();
-        Operand operand1 = new Operand(operationTokenLst.get(1).getLexeme(), "", "", "");
-        Operand operand3 = new Operand(operationTokenLst.get(3).getLexeme(), "", "", "");
+        Operand operand1 = new Operand(shouldBeRegister1.getLexeme(), "", "", "");
+        Operand operand3 = new Operand(shouldBeRegister2.getLexeme(), "", "", "");
         OpRecord opRecord = new OpRecord(lineNum, opCode, operand1, null, operand3);
         return opRecord;
     }
     private OpRecord createLoadiIR(List<Token> operationTokenLst){
-        if (operationTokenLst.size() != 4) return null;
-        if (operationTokenLst.get(1).getTokenCategory() != TokenCategory.CONSTANT){
-            printErr(operationTokenLst.get(1));
-            return null;    
-        } else if (operationTokenLst.get(2).getTokenCategory() != TokenCategory.INTO) {
-            printErr(operationTokenLst.get(2));
-            return null;
-        } else if (operationTokenLst.get(3).getTokenCategory() != TokenCategory.REGISTER) {
-            printErr(operationTokenLst.get(3));
-            return null;
-        }
+
+        Token shouldBeConst = expectToken(operationTokenLst, 1, TokenCategory.CONSTANT);
+        if (shouldBeConst == null) return null;
+
+        Token shouldBeInto = expectToken(operationTokenLst, 2, TokenCategory.INTO);
+        if (shouldBeInto == null) return null;
+
+        Token shouldBeRegister = expectToken(operationTokenLst, 3, TokenCategory.REGISTER);
+        if (shouldBeRegister == null) return null;
+
         Token operatorToken = operationTokenLst.get(0);
         int lineNum = operatorToken.getLineNumber();
         int opCode = operatorToken.getOpCode();
-        Operand operand1 = new Operand(operationTokenLst.get(1).getLexeme(), "", "", "");
-        Operand operand3 = new Operand(operationTokenLst.get(3).getLexeme(), "", "", "");
+        Operand operand1 = new Operand(shouldBeConst.getLexeme(), "", "", "");
+        Operand operand3 = new Operand(shouldBeRegister.getLexeme(), "", "", "");
         OpRecord opRecord = new OpRecord(lineNum, opCode, operand1, null, operand3);
         return opRecord;
     }
+    
     private OpRecord createArithopIR(List<Token> operationTokenLst){
-        if (operationTokenLst.size() != 6) return null;
-        if (operationTokenLst.get(1).getTokenCategory() != TokenCategory.REGISTER){
-            printErr(operationTokenLst.get(1));
-            return null;    
-        } else if (operationTokenLst.get(2).getTokenCategory() != TokenCategory.COMMA) {
-            printErr(operationTokenLst.get(2));
-            return null;
-        } else if (operationTokenLst.get(3).getTokenCategory() != TokenCategory.REGISTER) {
-            printErr(operationTokenLst.get(3));
-            return null;
-        } else if (operationTokenLst.get(4).getTokenCategory() != TokenCategory.INTO) {
-            printErr(operationTokenLst.get(4));
-            return null;
-        } else if (operationTokenLst.get(5).getTokenCategory() != TokenCategory.REGISTER) {
-            printErr(operationTokenLst.get(5));
-            return null;
-        }
+
+        Token shouldBeRegister1 = expectToken(operationTokenLst, 1, TokenCategory.REGISTER);
+        if (shouldBeRegister1 == null) return null;
+        
+        Token shouldBeComma = expectToken(operationTokenLst, 2, TokenCategory.COMMA);
+        if (shouldBeComma == null) return null;
+
+        Token shouldBeRegister2 = expectToken(operationTokenLst, 3, TokenCategory.REGISTER);
+        if (shouldBeRegister2 == null) return null;
+
+        Token shouldBeInto = expectToken(operationTokenLst, 4, TokenCategory.INTO);
+        if (shouldBeInto == null) return null;
+
+        Token shouldBeRegister3 = expectToken(operationTokenLst, 5, TokenCategory.REGISTER);
+        if (shouldBeRegister3 == null) return null;
+             
         Token operatorToken = operationTokenLst.get(0);
         int lineNum = operatorToken.getLineNumber();
         int opCode = operatorToken.getOpCode();
-        Operand operand1 = new Operand(operationTokenLst.get(1).getLexeme(), "", "", "");
-        Operand operand2 = new Operand(operationTokenLst.get(3).getLexeme(), "", "", "");
-        Operand operand3 = new Operand(operationTokenLst.get(5).getLexeme(), "", "", "");
+        Operand operand1 = new Operand(shouldBeRegister1.getLexeme(), "", "", "");
+        Operand operand2 = new Operand(shouldBeRegister2.getLexeme(), "", "", "");
+        Operand operand3 = new Operand(shouldBeRegister3.getLexeme(), "", "", "");
         OpRecord opRecord = new OpRecord(lineNum, opCode, operand1, operand2, operand3);
         return opRecord;
     }
     private OpRecord createOutputIR(List<Token> operationTokenLst){
-        if (operationTokenLst.size() != 2) return null;
-        if (operationTokenLst.get(1).getTokenCategory() != TokenCategory.CONSTANT){
-            printErr(operationTokenLst.get(1));
-            return null;    
-        } 
+
+        Token shouldBeConstant = expectToken(operationTokenLst, 1, TokenCategory.CONSTANT);
+        if (shouldBeConstant == null) return null;
+
         Token operatorToken = operationTokenLst.get(0);
         int lineNum = operatorToken.getLineNumber();
         int opCode = operatorToken.getOpCode();
-        Operand operand1 = new Operand(operationTokenLst.get(1).getLexeme(), "", "", "");
+        Operand operand1 = new Operand(shouldBeConstant.getLexeme(), "", "", "");
 
         OpRecord opRecord = new OpRecord(lineNum, opCode, operand1, null, null);
         return opRecord;
     }
     private OpRecord createNopIR(List<Token> operationTokenLst){
-        if (operationTokenLst.size() != 1) return null;
         
         Token operatorToken = operationTokenLst.get(0);
+        if (operationTokenLst.size() != 1) {
+            System.err.println(String.format("ERROR %d: \tnop operation is not supposed to have any tokens", operatorToken.getLineNumber()));
+        }
         int lineNum = operatorToken.getLineNumber();
         int opCode = operatorToken.getOpCode();
         OpRecord opRecord = new OpRecord(lineNum, opCode, null, null, null);
         return opRecord;
     }
-
-    private void printErr(Token operationToken){
-        System.out.println(operationToken.getTokenCategory().name());
-        System.err.println(String.format("Error %d: \t%s is not a valid word.", operationToken.getLineNumber(), operationToken.getLexeme()));
+    private Token expectToken(List<Token> tokens, int index, TokenCategory expectedCategory) {
+        Token tok = (index >= 0 && index < tokens.size()) ? tokens.get(index) : null;
+        if (tok == null || tok.getTokenCategory() != expectedCategory) {
+            printErr(tokens.get(0), tok);
+            return null;
+        }
+        return tok;
     }
-    // public static void main(String[] args) {
-    //     Parser parser = new Parser(new File("test_inputs/t1.i"));
-    //     parser.parseAndPrintIR();
+    private void printErr(Token operationToken, Token curToken){
+        if (curToken == null) {
+            System.err.println(String.format("ERROR %d: \tMissing Token", operationToken.getLineNumber()));
+            return;
+        }
+        System.err.println(String.format("ERROR %d: \t\"%s\" is not a valid word.", operationToken.getLineNumber(), curToken.getLexeme()));
+    }
+    public static void main(String[] args) {
+        Parser parser = new Parser(new File("test_inputs/autoGraderTests/parse.i"));
+        parser.parseAndPrintIR();
 
-    // }
+    }
 
 }
