@@ -20,9 +20,12 @@ public class Main {
                 scanParseFile(filePath, true, false);
             } else if (flag.equals("-p")){
                 scanParseFile(filePath, false, false);//doesn't print IR
-            } else if (flag.equals("-r")){
+            } else if (flag.equals("-x")){
                 scanParseFile(filePath, false, true);
             }
+            // else if (flag.equals("-x")){
+            //     scanParseFile(filePath, false, true);
+            // }
         } else {
             System.err.println("Please input one command line flag for each operation.");
             printCommandDescription();

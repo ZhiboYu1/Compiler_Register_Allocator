@@ -218,7 +218,7 @@ public class Scanner {
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(new File("test_inputs/autoGraderTests/T8k2.i"));
+        Scanner scanner = new Scanner(new File("Compiler_Register_Allocator/test_inputs/autoGraderTests/T8k2.i"));
         scanner.scanEntireFile();
     }
 }

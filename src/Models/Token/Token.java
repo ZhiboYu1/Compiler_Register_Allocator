@@ -1,10 +1,11 @@
-package Token;
+package Models.Token;
+import Models.OpCode;
 public class Token {
     private int lineNumber;
     private TokenCategory category;
     private String lexeme;
-    public final static String[] OP_CODE = {""};
-    private int opCode;
+
+    private OpCode opCode;
     public Token(int lineNumber, TokenCategory category, String lexeme){
         this.lineNumber = lineNumber;
         this.category = category;
@@ -29,7 +30,7 @@ public class Token {
             case "mult":
                 this.opCode = 6;
                 break;
-            case "lshilft":
+            case "lshift":
                 this.opCode = 7;
                 break;
             case "rshift":

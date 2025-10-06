@@ -1,4 +1,4 @@
-package Token;
+package Models.Token;
 public enum TokenCategory {
     MEMOP,   // 0
     LOADI,   // 1

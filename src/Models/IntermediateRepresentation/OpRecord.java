@@ -1,5 +1,8 @@
 package IntermediateRepresentation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class OpRecord {
     private int line;
     private int opCode;
@@ -21,6 +24,19 @@ public class OpRecord {
     }
     public int getOpCode() {
         return this.opCode;
+    }
+    public List<Operand> getOperands(){
+        List<Operand> operandsList = new ArrayList<>();
+        if (this.operand1 != null){
+            operandsList.add(operand1);
+        }
+        if (this.operand2 != null){
+            operandsList.add(operand2);
+        }
+        if (this.operand3 != null){
+            operandsList.add(operand3);
+        }
+        return operandsList;
     }
     public Operand getOperand1() {
         return this.operand1;
