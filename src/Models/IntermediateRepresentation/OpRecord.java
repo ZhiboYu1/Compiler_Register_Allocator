@@ -2,16 +2,17 @@ package IntermediateRepresentation;
 
 import java.util.ArrayList;
 import java.util.List;
+import Token.Opcode;
 
 public class OpRecord {
     private int line;
-    private int opCode;
+    private Opcode opCode;
     private Operand operand1;
     private Operand operand2;
     private Operand operand3;
     private OpRecord prev;
     private OpRecord next;
-    public OpRecord(int line, int opCode, Operand operand1, Operand operand2, Operand operand3) {
+    public OpRecord(int line, Opcode opCode, Operand operand1, Operand operand2, Operand operand3) {
         this.line = line;
         this.opCode = opCode;
         this.operand1 = operand1;
@@ -22,7 +23,7 @@ public class OpRecord {
     public int getLine() {
         return this.line;
     }
-    public int getOpCode() {
+    public Opcode getOpCode() {
         return this.opCode;
     }
     public List<Operand> getOperands(){
@@ -60,7 +61,7 @@ public class OpRecord {
         return this.prev;
     }
     public String toString() {
-        return String.format("%d    [ %s ], [ %s ], [ %s ]", this.opCode, this.operand1 == null ? "" : this.operand1.toString(), 
+        return String.format("%s    [ %s ], [ %s ], [ %s ]", this.opCode, this.operand1 == null ? "" : this.operand1.toString(), 
         this.operand2 == null ? "" : this.operand2.toString(), this.operand3 == null ? "" :this.operand3.toString());
     }
 }

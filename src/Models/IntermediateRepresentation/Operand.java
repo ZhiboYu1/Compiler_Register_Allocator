@@ -19,8 +19,20 @@ public class Operand {
     public Integer getSR(){
         return this.SR;
     }
+    public Integer getVR(){
+        return this.VR;
+    }
     public void setVR(int vrNumber) {
         this.VR = vrNumber;
+    }
+    public Integer getPR() {
+        return this.PR;
+    }
+    public void setPR(int prNumber) {
+        this.PR = prNumber;
+    }
+    public Integer getNU() {
+        return this.NU;
     }
     public void setNU(int nu){
         this.NU = nu;

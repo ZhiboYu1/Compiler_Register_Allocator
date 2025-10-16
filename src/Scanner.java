@@ -80,6 +80,7 @@ public class Scanner {
             //System.out.println("currentLineIndex: " + this.currentLineIndex);
             // keep scanning this current line
             if (this.currentLineIndex < this.currentLineLength){
+                //System.out.println("currentLineIndex: " + this.currentLineIndex);
                 //have to check whether currentLineLength != 0, otherwise the first line of file will never be read
                 //System.out.println("currentLine: " + this.currentLine);
                 Token nextToken = scanNextToken();
@@ -116,6 +117,7 @@ public class Scanner {
      * @return
      */
     private Token scanNextToken(){
+        //System.out.println("current line under scanning: " + this.currentLine);
         char[] currentLineCharArr = this.currentLine.toCharArray();
         // move the start index (currentLineIndex) to the first non-whitespace character
         while (this.currentLineIndex < this.currentLineLength && Character.isWhitespace(currentLineCharArr[this.currentLineIndex])){
@@ -130,11 +132,14 @@ public class Scanner {
         
         int endOfNextTokenIndex = this.currentLineIndex + 1;
         // check whether the following two characters is a comment
-        if ((currentLineCharArr[currentLineIndex] == currentLineCharArr[endOfNextTokenIndex]) && 
-        (currentLineCharArr[currentLineIndex] == '/')){
-            this.currentLineIndex = this.currentLineLength + 1;
-            return new Token(this.lineNumber, TokenCategory.EOL, "\\n");
+        if (endOfNextTokenIndex < this.currentLineLength){
+            if ((currentLineCharArr[currentLineIndex] == currentLineCharArr[endOfNextTokenIndex]) && 
+            (currentLineCharArr[currentLineIndex] == '/')){
+                this.currentLineIndex = this.currentLineLength + 1;
+                return new Token(this.lineNumber, TokenCategory.EOL, "\\n");
+            }
         }
+        
         
         // move the end index (endOfNextTokenIndex) to the last index before a whitespace/register/into sign
         while (endOfNextTokenIndex < this.currentLineLength

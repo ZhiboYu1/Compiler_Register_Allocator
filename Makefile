@@ -14,7 +14,7 @@ MAIN = Main
 # Targets
 all: build
 
-build: lab1.jar 412fe
+build: lab1.jar 412alloc
 
 # Compile all .java files at once into proper package folders
 classes:
@@ -24,10 +24,10 @@ classes:
 lab1.jar: classes
 	$(JAR) cfe lab1.jar $(MAIN) -C $(BIN_DIR) .
 
-412fe:
-	echo '#!/bin/bash' > 412fe
-	echo 'java -jar lab1.jar "$$@"' >> 412fe
-	chmod a+x 412fe
+412alloc:
+	echo '#!/bin/bash' > 412alloc
+	echo 'java -jar lab1.jar "$$@"' >> 412alloc
+	chmod a+x 412alloc
 
 clean:
 	rm -rf $(BIN_DIR) lab1.jar 412fe
