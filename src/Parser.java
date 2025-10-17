@@ -112,10 +112,10 @@ public class Parser {
     public void parseRenameAndPrintILOC(boolean printVR, boolean printPR, int k){
         parse();
         renameIR();
-        if (printPR) {
-            RegisterAllocator registerAllocator = new RegisterAllocator(k, this.maxLive, this.IRHead, this.maxVRNumber);
-            registerAllocator.allocateRegister();
-        }
+        //Register Allocation
+        RegisterAllocator registerAllocator = new RegisterAllocator(k, this.maxLive, this.IRHead.getNext(), this.maxVRNumber);
+        registerAllocator.allocateRegister();
+        
         printRenamedIR(printVR, printPR);
     }
     /**
@@ -354,8 +354,9 @@ public class Parser {
             curOpRecord = curOpRecord.getPrev();
             
         }
-        System.out.println("current max VR number: " + this.maxVRNumber);
-        System.out.println("current code block's maxlive: " + this.maxLive);
+        this.maxVRNumber = VRName - 1;
+        //System.out.println("current max VR number: " + this.maxVRNumber);
+        //System.out.println("current code block's maxlive: " + this.maxLive);
         //System.out.println("current SRToVR: " );
         // for (int value : SRToVR){
             
@@ -428,7 +429,8 @@ public class Parser {
             System.err.println("Error getting canonical path: " + e.getMessage());
         }
         Parser parser = new Parser(new File("/storage-home/z/zy53/comp412/lab2/Compiler_Register_Allocator/test_inputs/slides.i"));
-        parser.parseRenameAndPrintILOC(false, true, 10);
+        parser.parseRenameAndPrintILOC(false, true, 4);
+        //parser.parseRenameAndPrintILOC(true, false, 10);
         //parser.parseAndPrintIR();
         
 

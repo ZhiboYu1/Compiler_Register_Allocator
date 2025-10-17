@@ -1,11 +1,10 @@
-package Models.Token;
-import Models.OpCode;
+package Token;
 public class Token {
     private int lineNumber;
     private TokenCategory category;
     private String lexeme;
 
-    private OpCode opCode;
+    private Opcode opCode;
     public Token(int lineNumber, TokenCategory category, String lexeme){
         this.lineNumber = lineNumber;
         this.category = category;
@@ -13,34 +12,34 @@ public class Token {
 
         switch (lexeme) {
             case "load":
-                this.opCode = 1;
+                this.opCode = Opcode.load;
                 break;
             case "loadI":
-                this.opCode = 2;
+                this.opCode = Opcode.loadI;
                 break;
             case "store":
-                this.opCode = 3;
+                this.opCode = Opcode.store;
                 break;
             case "add":
-                this.opCode = 4;
+                this.opCode = Opcode.add;
                 break;
             case "sub":
-                this.opCode = 5;
+                this.opCode = Opcode.sub;
                 break;
             case "mult":
-                this.opCode = 6;
+                this.opCode = Opcode.mult;
                 break;
             case "lshift":
-                this.opCode = 7;
+                this.opCode = Opcode.lshift;
                 break;
             case "rshift":
-                this.opCode = 8;
+                this.opCode = Opcode.rshift;
                 break;
             case "nop":
-                this.opCode = 9;
+                this.opCode = Opcode.nop;
                 break;
             case "output":
-                this.opCode = 10;
+                this.opCode = Opcode.output;
                 break;
         }
     }
@@ -53,7 +52,7 @@ public class Token {
     public String getLexeme(){
         return this.lexeme;
     }
-    public int getOpCode(){
+    public Opcode getOpCode(){
         return this.opCode;
     }
     public String toString(){

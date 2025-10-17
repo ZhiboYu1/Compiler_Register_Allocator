@@ -1,3 +1,4 @@
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class RegisterAllocator {
         this.VRToPR = new int[this.maxVRNumber + 1];
         this.VRToSpillLoc = new int[this.maxVRNumber + 1];
         this.spilledAddr = 32768;
+        this.PRStack = new ArrayDeque<>();
         for (int vr = 0; vr <= this.maxVRNumber; vr++){
             this.VRToPR[vr] = -1;
             this.VRToSpillLoc[vr] = -1;
@@ -52,13 +54,13 @@ public class RegisterAllocator {
     public void allocateRegister(){
         
         OpRecord curOpRecord = this.IRHead;
-        while (curOpRecord.getNext() != null) {
+        while (curOpRecord != null) {
             //clear the mark in each PR
             this.curOpRecordPRs = new boolean[k];
             
             List<Operand> curRecordOperands = curOpRecord.getOperands();
             int operandsSize = curRecordOperands.size();
-
+            //System.out.println("current operation operands: " + curRecordOperands);
             Operand definedRegister = curRecordOperands.get(operandsSize - 1);
 
             // Now handle used registers
@@ -108,7 +110,7 @@ public class RegisterAllocator {
     private Integer getAPR(Integer VR, Integer NU, OpRecord curOpRecord){
         int x = -1;
         if (!this.PRStack.isEmpty()){
-            x = this.PRStack.pollLast();
+            x = this.PRStack.pollFirst();
         } else {
             //TODO: pick an unmarked x to spill; what if there is a tie between multiple PRs
             //int toBeSpilledPR = -1;

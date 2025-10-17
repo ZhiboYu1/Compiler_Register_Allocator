@@ -11,24 +11,24 @@ public class Main {
             if (args[0].equals("-h")){
                 printCommandDescription();
             } else {
-                scanParseFile(args[0], false, false, false, false, false);
+                scanParseFile(args[0], false, false, false, false, -1);
             }
         } else if (args.length == 2){
             try {
                 int k = Integer.parseInt(args[0]);
                 String filePath = args[1];
-                scanParseFile(filePath, false, false, true, false, true);
+                scanParseFile(filePath, false, false, true, false, k);
             } catch (NumberFormatException e) {
                 String flag = args[0];
                 String filePath = args[1];
                 if (flag.equals("-s")){
-                    scanParseFile(filePath, true, false, false, false, false);
+                    scanParseFile(filePath, true, false, false, false, -1);
                 } else if (flag.equals("-p")){
-                    scanParseFile(filePath, false, false, false, false, false);//doesn't print IR
+                    scanParseFile(filePath, false, false, false, false, -1);//doesn't print IR
                 } else if (flag.equals("-r")){
-                    scanParseFile(filePath, false, true, false, false, false);
+                    scanParseFile(filePath, false, true, false, false, -1);
                 } else if (flag.equals("-x")){
-                    scanParseFile(filePath, false, false, true, true, false);
+                    scanParseFile(filePath, false, false, true, false, -1);
                 } 
             }
             
@@ -47,17 +47,20 @@ public class Main {
      * @param filePath
      * @param onlyScan
      * @param printIR
+     * @param printVR boolean value representing whether we want to print ILOC block with VR values (after renaming and register allocation)
+     * @param printPR boolean value representing whether we want to print ILOC block with PR values (after renaming and register allocation)
+     * @param k
      */
-    private static void scanParseFile(String filePath, boolean onlyScan, boolean printIR, boolean printRenamedBlock, boolean printVR, boolean printPR){
+    private static void scanParseFile(String filePath, boolean onlyScan, boolean printIR, boolean printVR, boolean printPR, int k){
         File toBeParsedFile = new File(filePath);
         if (toBeParsedFile.exists()){
             if (!onlyScan){
                 Parser parser = new Parser(toBeParsedFile);
                 if (printIR){
                     parser.parseAndPrintIR();
-                } else if (printRenamedBlock){
+                } else if (printVR || printPR){
                     //TODO: including k as a parameter might not be a good design
-                    parser.parseRenameAndPrintILOC(printVR, printPR, -1);
+                    parser.parseRenameAndPrintILOC(printVR, printPR, k);
                 } else {
                     parser.parse();
                 }
