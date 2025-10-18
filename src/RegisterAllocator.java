@@ -56,12 +56,29 @@ public class RegisterAllocator {
         OpRecord curOpRecord = this.IRHead;
         while (curOpRecord != null) {
             //clear the mark in each PR
-            this.curOpRecordPRs = new boolean[k];
+            this.curOpRecordPRs = new boolean[this.k];
             
             List<Operand> curRecordOperands = curOpRecord.getOperands();
+            if (curRecordOperands == null) {
+                curOpRecord = curOpRecord.getNext();
+                //System.out.println("curOpRecord: "+ curOpRecord.toString());
+                continue;
+            }
             int operandsSize = curRecordOperands.size();
+
+            // edge case when the current record is EOF/EOL/NOP
+            if (operandsSize == 0) {
+                curOpRecord = curOpRecord.getNext();
+                //System.out.println("curOpRecord: "+ curOpRecord.toString());
+                continue;
+            }
             //System.out.println("current operation operands: " + curRecordOperands);
             Operand definedRegister = curRecordOperands.get(operandsSize - 1);
+            if (!definedRegister.isRegister()) {
+                    curOpRecord = curOpRecord.getNext();
+                    //System.out.println("curOpRecord: "+ curOpRecord.toString());
+                    continue;
+            }//it means that the current operation is OUTPUT, and the only operand is an integer
 
             // Now handle used registers
             if (curOpRecord.getOpCode() != Opcode.store){
@@ -77,7 +94,13 @@ public class RegisterAllocator {
                 if (pr == -1) {
                     pr = getAPR(usedOperand.getVR(), usedOperand.getNU(), curOpRecord);
                     usedOperand.setPR(pr);
+                    //System.out.println("current operation record where a restore should take place right after: " + curOpRecord);
+                    OpRecord prev = curOpRecord.getPrev();
                     restore(usedOperand.getVR(), usedOperand.getPR(), curOpRecord);
+                    // System.out.println("prev: " + prev);
+                    // System.out.println("is supposed to be loadI: " + prev.getNext());
+                    // System.out.println("is supposed to be load: " + prev.getNext().getNext());
+                    // System.out.println("is supposed to be cur: " + prev.getNext().getNext().getNext());
                 } else {
                     usedOperand.setPR(pr);
                 }
@@ -94,7 +117,7 @@ public class RegisterAllocator {
                 
             }
             //TODO: clear the mark in each PR
-            this.curOpRecordPRs = new boolean[k];
+            this.curOpRecordPRs = new boolean[this.k];
             //now handle defined register  
             if (curOpRecord.getOpCode() != Opcode.store){
                 int pr = getAPR(definedRegister.getVR(), definedRegister.getNU(), curOpRecord);
@@ -155,7 +178,8 @@ public class RegisterAllocator {
         //update spilledAddr and VRToSpilledLoc
         this.VRToSpillLoc[this.PRToVR[x]] = this.spilledAddr;
         this.spilledAddr += 4;
-        
+        //since the VR is now stored in memory, we should reset its value in VRToPR
+        this.VRToPR[this.PRToVR[x]] = -1;
         //set each operation's prev and next
         preOpRecord.setNext(loadIRecord);
 

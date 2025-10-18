@@ -113,9 +113,10 @@ public class Parser {
         parse();
         renameIR();
         //Register Allocation
-        RegisterAllocator registerAllocator = new RegisterAllocator(k, this.maxLive, this.IRHead.getNext(), this.maxVRNumber);
-        registerAllocator.allocateRegister();
-        
+        if (printPR) {
+            RegisterAllocator registerAllocator = new RegisterAllocator(k, this.maxLive, this.IRHead.getNext(), this.maxVRNumber);
+            registerAllocator.allocateRegister();
+        }
         printRenamedIR(printVR, printPR);
     }
     /**
@@ -428,8 +429,9 @@ public class Parser {
         } catch (java.io.IOException e) {
             System.err.println("Error getting canonical path: " + e.getMessage());
         }
-        Parser parser = new Parser(new File("/storage-home/z/zy53/comp412/lab2/Compiler_Register_Allocator/test_inputs/slides.i"));
-        parser.parseRenameAndPrintILOC(false, true, 4);
+        Parser parser = new Parser(new File("/storage-home/z/zy53/comp412/lab2/Compiler_Register_Allocator/test_inputs/cc1.i"));
+        //System.out.println("hello");
+        parser.parseRenameAndPrintILOC(false, true, 5);
         //parser.parseRenameAndPrintILOC(true, false, 10);
         //parser.parseAndPrintIR();
         

@@ -38,6 +38,6 @@ public class Operand {
         this.NU = nu;
     }
     public String toString() {
-        return String.format("SR: %s", this.SR);
+        return String.format("[SR: %s, VR: %s, PR: %s]", this.SR, this.VR, this.PR);
     }
 }

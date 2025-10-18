@@ -17,7 +17,7 @@ public class Main {
             try {
                 int k = Integer.parseInt(args[0]);
                 String filePath = args[1];
-                scanParseFile(filePath, false, false, true, false, k);
+                scanParseFile(filePath, false, false, false, true, k);
             } catch (NumberFormatException e) {
                 String flag = args[0];
                 String filePath = args[1];
