@@ -1,1 +1,1 @@
-load    
+output 0

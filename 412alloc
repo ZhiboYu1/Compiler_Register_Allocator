@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar lab1.jar "$@"
+java -jar lab2.jar "$@"
