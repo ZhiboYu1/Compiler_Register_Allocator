@@ -38,7 +38,7 @@ public class RegisterAllocator {
         this.PRStack = new ArrayDeque<>();
         for (int vr = 0; vr <= this.maxVRNumber; vr++){
             this.VRToPR[vr] = -1;
-            this.VRToSpillLoc[vr] = -1;
+            this.VRToSpillLoc[vr] = Integer.MAX_VALUE;
         }
         this.PRToVR = new int[this.k];
         this.PRNU = new int[this.k];
@@ -73,6 +73,16 @@ public class RegisterAllocator {
                 continue;
             }
             //System.out.println("current operation operands: " + curRecordOperands);
+
+            //special handling for rematerializable values
+            if (curOpRecord.getOpCode().equals(Opcode.loadI)){
+                int curVR = curOpRecord.getOperand3().getVR();
+                int addr = curOpRecord.getOperand1().getSR();
+                this.VRToSpillLoc[curVR] = -addr;
+                // System.out.println("curOpRecord: " + curOpRecord);
+                // System.out.println(String.format("VRToSpillLoc[%d] = %d", curVR, this.VRToSpillLoc[curVR]));
+            }
+
             Operand definedRegister = curRecordOperands.get(operandsSize - 1);
             if (!definedRegister.isRegister()) {
                     curOpRecord = curOpRecord.getNext();
@@ -116,13 +126,13 @@ public class RegisterAllocator {
                 }
                 
             }
-            //TODO: clear the mark in each PR
+            // clear the mark in each PR
             this.curOpRecordPRs = new boolean[this.k];
             //now handle defined register  
             if (curOpRecord.getOpCode() != Opcode.store){
                 int pr = getAPR(definedRegister.getVR(), definedRegister.getNU(), curOpRecord);
                 definedRegister.setPR(pr);
-                //TODO: set the mark in definedRegister.PR
+                // set the mark in definedRegister.PR
                 this.curOpRecordPRs[pr] = true;
             }
             
@@ -135,7 +145,7 @@ public class RegisterAllocator {
         if (!this.PRStack.isEmpty()){
             x = this.PRStack.pollFirst();
         } else {
-            //TODO: pick an unmarked x to spill; what if there is a tie between multiple PRs
+            //pick an unmarked x to spill; what if there is a tie between multiple PRs
             //int toBeSpilledPR = -1;
             int farthestNextUse = -1;
             for (int i = 0; i < this.PRNU.length; i++){
@@ -164,32 +174,45 @@ public class RegisterAllocator {
      * @param curOpRecord
      */
     private void spill(Integer x, OpRecord curOpRecord) {
-        int curOpRecordIndex = curOpRecord.getLine();
-        OpRecord preOpRecord = curOpRecord.getPrev();
-        OpRecord loadIRecord = new OpRecord(-1, Opcode.loadI, 
-                                            new Operand(this.spilledAddr, this.spilledAddr, this.spilledAddr, null, false), 
-                                            null, 
-                                            new Operand(null, null, this.reservedRegister, curOpRecordIndex, false));
-        OpRecord storeRecord = new OpRecord(-1, Opcode.store, 
-                                            new Operand(null, this.PRToVR[x], x, null, false), 
-                                            null, 
-                                            new Operand(null, null, this.reservedRegister, Integer.MAX_VALUE, false));
+        //special handling for the scenario when curOpRecord is LoadI, since it can be rematerialized
+        //System.out.println(String.format("current value of VRToSpillLoc[%d]: %d", this.PRToVR[x], this.VRToSpillLoc[this.PRToVR[x]]));
+        if (this.VRToSpillLoc[this.PRToVR[x]] <= 0){
+            //System.out.println("rematerialize " + curOpRecord);
+            //since the VR is now stored in memory, we should reset its value in VRToPR
+        } else {
+            //go here: " + curOpRecord);
+            //general cases
+            int curOpRecordIndex = curOpRecord.getLine();
+            OpRecord preOpRecord = curOpRecord.getPrev();
+            OpRecord loadIRecord = new OpRecord(-1, Opcode.loadI, 
+                                                new Operand(this.spilledAddr, this.spilledAddr, this.spilledAddr, null, false), 
+                                                null, 
+                                                new Operand(null, null, this.reservedRegister, curOpRecordIndex, false));
+            OpRecord storeRecord = new OpRecord(-1, Opcode.store, 
+                                                new Operand(null, this.PRToVR[x], x, null, false), 
+                                                null, 
+                                                new Operand(null, null, this.reservedRegister, Integer.MAX_VALUE, false));
+            
+            //update spilledAddr and VRToSpilledLoc
+            this.VRToSpillLoc[this.PRToVR[x]] = this.spilledAddr;
+            this.spilledAddr += 4;
+            
+            //set each operation's prev and next
+            preOpRecord.setNext(loadIRecord);
+
+            loadIRecord.setPrev(preOpRecord);
+            loadIRecord.setNext(storeRecord);
+
+            storeRecord.setPrev(loadIRecord);
+            storeRecord.setNext(curOpRecord);
+
+            curOpRecord.setPrev(storeRecord);
+        }
         
-        //update spilledAddr and VRToSpilledLoc
-        this.VRToSpillLoc[this.PRToVR[x]] = this.spilledAddr;
-        this.spilledAddr += 4;
         //since the VR is now stored in memory, we should reset its value in VRToPR
         this.VRToPR[this.PRToVR[x]] = -1;
-        //set each operation's prev and next
-        preOpRecord.setNext(loadIRecord);
-
-        loadIRecord.setPrev(preOpRecord);
-        loadIRecord.setNext(storeRecord);
-
-        storeRecord.setPrev(loadIRecord);
-        storeRecord.setNext(curOpRecord);
-
-        curOpRecord.setPrev(storeRecord);
+        // this.PRToVR[x] = -1;
+        // this.PRNU[this.PRToVR[x]] = Integer.MAX_VALUE;
     }
     /**
      * 
@@ -200,25 +223,45 @@ public class RegisterAllocator {
     private void restore(Integer VR, Integer PR, OpRecord curOpRecord){
         int curOpRecordIndex = curOpRecord.getLine();
         OpRecord preOpRecord = curOpRecord.getPrev();
-        OpRecord loadIRecord = new OpRecord(-1, Opcode.loadI, 
-                                            new Operand(this.VRToSpillLoc[VR], this.VRToSpillLoc[VR], this.VRToSpillLoc[VR], null, false), 
-                                            null, 
-                                            new Operand(null, null, this.reservedRegister, curOpRecordIndex, false));
-        OpRecord loadRecord = new OpRecord(-1, Opcode.load, 
-                                            new Operand(null, null, this.reservedRegister, null, false), 
-                                            null, 
-                                            new Operand(null, VR, PR, curOpRecordIndex, false));
+        //System.out.println("current VRToSpillLoc: ");
+        // for (int i = 0; i < this.VRToSpillLoc.length; i++) {
+        //     System.out.println(String.format("%d: %d", i, this.VRToSpillLoc[i]));
+        // }
+        //special handling for rematerialization value
+        if (this.VRToSpillLoc[VR] < 1) {
+            //System.out.println("now restore " + curOpRecord + ", it's spill loc is " + this.VRToSpillLoc[VR]);
+            OpRecord loadIRecord = new OpRecord(-1, Opcode.loadI, 
+                                                new Operand(-this.VRToSpillLoc[VR], -this.VRToSpillLoc[VR], -this.VRToSpillLoc[VR], null, false), 
+                                                null, 
+                                                new Operand(null, VR, PR, curOpRecordIndex, false));
+            preOpRecord.setNext(loadIRecord);
+
+            loadIRecord.setPrev(preOpRecord);
+            loadIRecord.setNext(curOpRecord);
+
+            curOpRecord.setPrev(loadIRecord);
+        } else if (this.VRToSpillLoc[VR] > 32767 && this.VRToSpillLoc[VR] != Integer.MAX_VALUE) {
+            //general case
+            OpRecord loadIRecord = new OpRecord(-1, Opcode.loadI, 
+                                                new Operand(this.VRToSpillLoc[VR], this.VRToSpillLoc[VR], this.VRToSpillLoc[VR], null, false), 
+                                                null, 
+                                                new Operand(null, null, this.reservedRegister, curOpRecordIndex, false));
+            OpRecord loadRecord = new OpRecord(-1, Opcode.load, 
+                                                new Operand(null, null, this.reservedRegister, null, false), 
+                                                null, 
+                                                new Operand(null, VR, PR, curOpRecordIndex, false));
+            
+            preOpRecord.setNext(loadIRecord);
+
+            loadIRecord.setPrev(preOpRecord);
+            loadIRecord.setNext(loadRecord);
+
+            loadRecord.setPrev(loadIRecord);
+            loadRecord.setNext(curOpRecord);
+
+            curOpRecord.setPrev(loadRecord);
+        }
         //update spilledAddr and VRToSpilledLoc
-        this.VRToSpillLoc[VR] = -1;
-
-        preOpRecord.setNext(loadIRecord);
-
-        loadIRecord.setPrev(preOpRecord);
-        loadIRecord.setNext(loadRecord);
-
-        loadRecord.setPrev(loadIRecord);
-        loadRecord.setNext(curOpRecord);
-
-        curOpRecord.setPrev(loadRecord);
+        this.VRToSpillLoc[VR] = Integer.MAX_VALUE;
     }
 }

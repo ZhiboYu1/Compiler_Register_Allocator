@@ -46,7 +46,7 @@ public class Parser {
         //set current node to be the head node
         OpRecord curOpIR = this.IRHead;
         OpRecord preOpIR = null;
-        while ((nextToken = scanner.nextToken()) != null){
+        while ((nextToken = this.scanner.nextToken()) != null){
 
             // reset operationTokenLst to empty
             this.operationTokenLst = new ArrayList<>();
@@ -57,7 +57,7 @@ public class Parser {
             // we find an operation by keep calling nextToken() until we reach a EOL token
             while (nextToken.getTokenCategory().ordinal() != 10) {
                 this.operationTokenLst.add(nextToken);
-                nextToken = scanner.nextToken();
+                nextToken = this.scanner.nextToken();
             }
             // size 0 means we are reading an empty line or a comment
             if (this.operationTokenLst.size() == 0) {
@@ -93,7 +93,7 @@ public class Parser {
         
     }
     public void parseAndPrintIR(){
-        System.out.println("parse and print IR");
+        //System.out.println("parse and print IR");
         parse();
         
         if (!hasError) {
@@ -103,7 +103,6 @@ public class Parser {
                 cur = cur.getNext();
             }
         }
-        System.out.println("max sr number: " + this.maxSRNumber);
 
     }
     /**
@@ -430,7 +429,6 @@ public class Parser {
             System.err.println("Error getting canonical path: " + e.getMessage());
         }
         Parser parser = new Parser(new File("/storage-home/z/zy53/comp412/lab2/Compiler_Register_Allocator/test_inputs/cc1.i"));
-        //System.out.println("hello");
         parser.parseRenameAndPrintILOC(false, true, 5);
         //parser.parseRenameAndPrintILOC(true, false, 10);
         //parser.parseAndPrintIR();
